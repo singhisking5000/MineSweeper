@@ -1,3 +1,5 @@
+package com.example;
+
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,13 +16,7 @@ public class Client
     private static JLabel top;
     private static JLabel bottom;
     private static JPanel board;
-    private static int[][] tiles;
-    private static int rows = 9;
-    private static int cols = 9;
-
-    public static void main(String[] args)
-    {
-        int[][] tiles = {
+    private static int[][] tiles = {
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 1, 0, 0, 0, 1, 0, 0},
             {0, 0, 1, 0, 0, 0, 1, 0, 0},
@@ -30,7 +26,12 @@ public class Client
             {0, 0, 0, 1, 0, 1, 0, 0, 0},
             {0, 0, 0, 0, 1, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0, 0},
-        };
+        };;
+    private static int rows = 9;
+    private static int cols = 9;
+
+    public static void main(String[] args)
+    {
         setupGUI();
     }
 
@@ -55,37 +56,37 @@ public class Client
             for(int x = 0; x < tiles.length; x++){
                 for(int y = 0; y < tiles[x].length; x++){
                     ImageIcon img;
-                    img = new ImageIcon(ImageIO.read(new File("Bomb.png"))); // default to a bomb! :)
+                    img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/Bomb.png"))); // default to a bomb! :)
                     if(tiles[x][y] != 1) // If we're not a bomb...
                     {
                         switch (countNearbyBombs(x,y)) // pick a picture
                         {
                             case 1:
-                                img = new ImageIcon(ImageIO.read(new File("OneTile.png")));
+                                img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/OneTile.png")));
                                 break;
                             case 2:
-                                img = new ImageIcon(ImageIO.read(new File("TwoTile.png")));
+                                img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/TwoTile.png")));
                                 break;
                             case 3:
-                                img = new ImageIcon(ImageIO.read(new File("ThreeTile.png")));
+                                img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/ThreeTile.png")));
                                 break;
                             case 4:
-                                img = new ImageIcon(ImageIO.read(new File("FourTile.png")));
+                                img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/FourTile.png")));
                                 break;
                             case 5:
-                                img = new ImageIcon(ImageIO.read(new File("FiveTile.png")));
+                                img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/FiveTile.png")));
                                 break;
                             case 6:
-                                img = new ImageIcon(ImageIO.read(new File("SixTile.png")));
+                                img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/SixTile.png")));
                                 break;
                             case 7:
-                                img = new ImageIcon(ImageIO.read(new File("SevenTile.png")));
+                                img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/SevenTile.png")));
                                 break;
                             case 8:
-                                img = new ImageIcon(ImageIO.read(new File("EightTile.png")));
+                                img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/EightTile.png")));
                                 break;
                             default:
-                                img = new ImageIcon(ImageIO.read(new File("BlankTile.png")));
+                                img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/BlankTile.png")));
                                 break;
                         } // end of switch
                     } // end of if
@@ -130,14 +131,14 @@ public class Client
         if(col-1 > 0 && tiles[row][col-1] > 0) {
             count++;
         }
-        if(col+1 < cols+1 && tiles[row][col+1] > 0) {
+        if(col+1 < cols && tiles[row][col+1] > 0) {
             count++;
         }
 
         if(row-1 > 0 && tiles[row-1][col] > 0) {
             count++;
         }
-        if(row+1 < rows+1 && tiles[row+1][col] > 0) {
+        if(row+1 < rows && tiles[row+1][col] > 0) {
             count++;
         }
 
@@ -145,14 +146,14 @@ public class Client
         if(col-1 >0 && row-1 >0 && tiles[row-1][col-1] >0) {
             count++;
         }
-        if(col+1 < cols+1 && row-1 >0 && tiles[row-1][col+1] >0) {
+        if(col+1 < cols && row-1 >0 && tiles[row-1][col+1] >0) {
             count++;
         }
 
-        if(col-1 >0 && row+1 < rows+1 && tiles[row+1][col-1] >0) {
+        if(col-1 >0 && row+1 < rows && tiles[row+1][col-1] >0) {
             count++;
         }
-        if(col+1 < cols+1 && row+1 < rows+1 && tiles[row+1][col+1] >0) {
+        if(col+1 < cols && row+1 < rows && tiles[row+1][col+1] >0) {
             count++;
         }
         return count;

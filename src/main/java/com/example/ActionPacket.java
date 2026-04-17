@@ -1,3 +1,5 @@
+package com.example;
+
 
 
 // FROM CLIENT TO SERVER, says what the player did on their end, which the server will compute
