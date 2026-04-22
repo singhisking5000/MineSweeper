@@ -16,10 +16,10 @@ public class Client
     private static JLabel top;
     private static JLabel bottom;
     private static JPanel board;
-    private static int size = 20;
+    private static int size = 40;
     private static int[][] tiles = {
+            {0, 0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 1, 0, 0, 0, 1, 0, 0},
-            {0, 1, 0, 0, 0, 0, 0, 1, 0},
             {0, 0, 1, 0, 0, 0, 1, 0, 0},
             {0, 0, 0, 0, 1, 0, 0, 0, 0},
             {0, 1, 0, 0, 0, 0, 0, 1, 0},
@@ -39,9 +39,9 @@ public class Client
     private static void setupGUI()
     {
         f = new JFrame();
-        f.setLocation(500,500);
         f.setPreferredSize(new Dimension(size*cols, size*rows));
         f.setSize(new Dimension(size*cols, size*rows));
+        f.setLocation(500,200);
         top = new JLabel();
         bottom = new JLabel();
         board = new JPanel();
@@ -55,42 +55,42 @@ public class Client
         GridBagConstraints c = new GridBagConstraints();
 
         // Now set up the board
-
         try {
+
             for(int x = 0; x < tiles.length; x++){
                 for(int y = 0; y < tiles[x].length; y++){
                     ImageIcon img;
-                    img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/Bomb.png"))); // default to a bomb! :)
+                    img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/Bomb.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT)); // default to a bomb! :)
                     if(tiles[x][y] != 1) // If we're not a bomb...
                     {
                         switch (countNearbyBombs(x,y)) // pick a picture
                         {
                             case 1:
-                                img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/OneTile.png"))).getScaledInstance(size,size, Image.SCALE_SMOOTH));
+                                img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/OneTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
                                 break;
                             case 2:
-                                img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/TwoTile.png")));
+                                img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/TwoTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
                                 break;
                             case 3:
-                                img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/ThreeTile.png")));
+                                img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/ThreeTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
                                 break;
                             case 4:
-                                img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/FourTile.png")));
+                                img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/FourTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
                                 break;
                             case 5:
-                                img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/FiveTile.png")));
+                                img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/FiveTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
                                 break;
                             case 6:
-                                img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/SixTile.png")));
+                                img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/SixTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
                                 break;
                             case 7:
-                                img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/SevenTile.png")));
+                                img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/SevenTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
                                 break;
                             case 8:
-                                img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/EightTile.png")));
+                                img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/EightTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
                                 break;
                             default:
-                                img = new ImageIcon(ImageIO.read(new File("src/main/java/com/example/BlankTile.png")));
+                                img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/BlankTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
                                 break;
                         } // end of switch
                     } // end of if
