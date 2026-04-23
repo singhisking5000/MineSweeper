@@ -1,6 +1,8 @@
 package com.example;
 
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +11,9 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 public class Client
 {
@@ -31,10 +36,29 @@ public class Client
     private static int rows = 9;
     private static int cols = 9;
 
-    public static void main(String[] args)
-    {
+    // public static void main(String[] args)
+    // {
+    //     setupGUI();
+    // }
+    public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException, InterruptedException {
+        //get the localhost IP address, if server is running on some other IP, you need to use that
+        System.out.println("Running main in client!");
+        InetAddress host = InetAddress.getLocalHost();
+
+ 
+        Socket socket = new Socket(host.getHostName(), 9876);
+
+        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+        ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+        
+
+        inputReader incoming = new inputReader(in);
+        incoming.start();
+        System.out.println("going to call createGUI");
         setupGUI();
+        // createGUI(out, socket, in, incoming);
     }
+
 
     private static void setupGUI()
     {
@@ -105,25 +129,6 @@ public class Client
 
         f.setVisible(true);
     }
-    
-
-    // private static int[][] createField(int r, int c, int m) {
-    //     int[] tempField = new int[r*c];
-    //     for(int i = 0; i<m; i++) {
-    //         tempField[i] = 1;
-    //     }
-
-    //     Collections.shuffle(Arrays.asList(tempField));
-
-    //     //turn into 2d array
-    //     int[][] f = new int[r][c];
-    //     for(int i=0; i<tempField.length; i++) {
-    //         int row = i / c;
-    //         int col = i % r;
-    //         f[row][col] = tempField[i];
-    //     }
-    //     return f;
-    // }
 
     public static int countNearbyBombs(int row, int col) {
         if(tiles[row][col] == 1) {
@@ -162,8 +167,34 @@ public class Client
         }
         return count;
     }
-    // private void updateGUI(LogicPacket info)
-    // {
+    
 
-    // }
+    private static class inputReader extends Thread
+    {
+        //Catch all updates into our input stream
+        ObjectInputStream incomingMessageStream;
+
+        public inputReader(ObjectInputStream i) {
+            incomingMessageStream = i;
+        }
+
+        public void run() {
+            while(true)
+            {
+                try
+                {
+                    String incomingMessage = (String) incomingMessageStream.readObject();
+                    SwingUtilities.invokeLater(() -> {
+                        System.out.println(incomingMessage);
+                        // messageArea.setText(messageArea.getText() + "\n" + incomingMessage);
+                        // messageArea.setCaretPosition(messageArea.getDocument().getLength());
+                    });   
+                } catch (Exception e)
+                {
+                    System.err.println("Error at line 105: " + e);
+                    break;
+                }
+            }
+        }
+    }
 }

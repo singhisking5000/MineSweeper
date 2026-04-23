@@ -3,6 +3,7 @@ package com.example;
 
 import java.net.Socket;
 import java.sql.Connection;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
@@ -14,13 +15,30 @@ import java.util.List;
 public class Server
 {
     public static final int LISTENING_PORT = 9876;
-    //GameLogic logic = new GameLogic();
-    //Tile[][] board;
-    // enum Tile
-    // {
-    //     BOMB,
-    //     SAFE
-    // }
+    public Server(){
+        ServerSocket listener;
+
+        try {
+            listener = new ServerSocket(LISTENING_PORT);
+
+            while(true){
+                 //Keep creating new ConnectionHandlers
+                ConnectionHandler temp = new ConnectionHandler(listener.accept());
+                System.out.println("Successsfully connected to (" + temp.socket.getInetAddress().toString() + ")!");
+                temp.start();
+                // temp.out.writeObject("You have connected!");
+            }
+        } catch (Exception e) {
+            System.out.println("Sorry, the server has shut down.");
+            System.out.println("Error:  " + e);
+            return;
+        }
+    }
+
+    public static void main(String[] args)
+    {
+        new Server();
+    }
 
 
     // public Tile[][] getBoard()
