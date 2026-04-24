@@ -19,7 +19,6 @@ public class Client
 {
     private static JFrame f;
     private static JLabel top;
-    private static JLabel bottom;
     private static JPanel board;
     private static int size = 40;
     private static int[][] tiles = {
@@ -52,35 +51,42 @@ public class Client
         ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
         
 
-        inputReader incoming = new inputReader(in);
-        incoming.start();
+        updater updates = new updater(in); // A thread that actively listens for new updates
+        updates.start();
         System.out.println("going to call createGUI");
-        setupGUI();
+        setupGUI(socket, in, out, updates);
         // createGUI(out, socket, in, incoming);
     }
 
 
-    private static void setupGUI()
+    private static void setupGUI(Socket socket, ObjectInputStream i, ObjectOutputStream o, updater u)
     {
         f = new JFrame();
         f.setPreferredSize(new Dimension(size*cols, size*rows));
         f.setSize(new Dimension(size*cols, size*rows));
         f.setLocation(500,200);
         top = new JLabel();
-        bottom = new JLabel();
         board = new JPanel();
         f.setLayout(new BorderLayout());
         board.setLayout(new GridLayout(rows, cols));
         f.add(top, BorderLayout.NORTH);
         f.add(board, BorderLayout.CENTER);
-        f.add(bottom, BorderLayout.SOUTH);
 
         // for later use
         GridBagConstraints c = new GridBagConstraints();
 
         // Now set up the board
+        // to be implemented:
+        // if 0 = make a blank tile
+        // if 1 = still make blank
+        // if 2 = cleared, change icon to a number or CLEARED blank
+        // if 3 = change to bomb tile
+
+
         try {
 
+            // TEMPORARY creates its own custom board to test functions. DO NOT USE THIS ALMOST AT ALL
+            // USE ONLY AS REFERENCE FOR IMAGE SCALING, LOGIC, AND OTHERS, DO NOT USE OTHERWISE!!!!!!!
             for(int x = 0; x < tiles.length; x++){
                 for(int y = 0; y < tiles[x].length; y++){
                     ImageIcon img;
@@ -130,6 +136,12 @@ public class Client
         f.setVisible(true);
     }
 
+    /*
+        0 = hidden safe
+        1 = hidden bomb
+        2 = cleared safe
+        3 = cleared BOMB
+    */
     public static int countNearbyBombs(int row, int col) {
         if(tiles[row][col] == 1) {
             return 0;
@@ -137,45 +149,44 @@ public class Client
         int count = 0;
 
         //check surrounding tile is on the board AND is a bomb
-        if(col-1 > 0 && tiles[row][col-1] > 0) {
+        if(col-1 > 0 && tiles[row][col-1] % 2 > 0) {
             count++;
         }
-        if(col+1 < cols && tiles[row][col+1] > 0) {
-            count++;
-        }
-
-        if(row-1 > 0 && tiles[row-1][col] > 0) {
-            count++;
-        }
-        if(row+1 < rows && tiles[row+1][col] > 0) {
+        if(col+1 < cols && tiles[row][col+1] % 2 > 0) {
             count++;
         }
 
+        if(row-1 > 0 && tiles[row-1][col] % 2 > 0) {
+            count++;
+        }
+        if(row+1 < rows && tiles[row+1][col] % 2 > 0) {
+            count++;
+        }
         //diagonals
-        if(col-1 >0 && row-1 >0 && tiles[row-1][col-1] >0) {
+        if(col-1 >0 && row-1 >0 && tiles[row-1][col-1] % 2 >0) {
             count++;
         }
-        if(col+1 < cols && row-1 >0 && tiles[row-1][col+1] >0) {
+        if(col+1 < cols && row-1 >0 && tiles[row-1][col+1] % 2 >0) {
             count++;
         }
 
-        if(col-1 >0 && row+1 < rows && tiles[row+1][col-1] >0) {
+        if(col-1 >0 && row+1 < rows && tiles[row+1][col-1] % 2 >0) {
             count++;
         }
-        if(col+1 < cols && row+1 < rows && tiles[row+1][col+1] >0) {
+        if(col+1 < cols && row+1 < rows && tiles[row+1][col+1] % 2 >0) {
             count++;
         }
         return count;
     }
     
 
-    private static class inputReader extends Thread
+    private static class updater extends Thread
     {
         //Catch all updates into our input stream
-        ObjectInputStream incomingMessageStream;
+        ObjectInputStream updateStream;
 
-        public inputReader(ObjectInputStream i) {
-            incomingMessageStream = i;
+        public updater(ObjectInputStream i) {
+            updateStream = i;
         }
 
         public void run() {
@@ -183,7 +194,7 @@ public class Client
             {
                 try
                 {
-                    String incomingMessage = (String) incomingMessageStream.readObject();
+                    String incomingMessage = (String) updateStream.readObject();
                     SwingUtilities.invokeLater(() -> {
                         System.out.println(incomingMessage);
                         // messageArea.setText(messageArea.getText() + "\n" + incomingMessage);

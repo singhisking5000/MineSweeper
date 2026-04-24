@@ -15,9 +15,10 @@ import java.util.List;
 public class Server
 {
     public static final int LISTENING_PORT = 9876;
+
+    // Upon creating a server, establish all of the following connections
     public Server(){
         ServerSocket listener;
-
         try {
             listener = new ServerSocket(LISTENING_PORT);
 
@@ -26,7 +27,6 @@ public class Server
                 ConnectionHandler temp = new ConnectionHandler(listener.accept());
                 System.out.println("Successsfully connected to (" + temp.socket.getInetAddress().toString() + ")!");
                 temp.start();
-                // temp.out.writeObject("You have connected!");
             }
         } catch (Exception e) {
             System.out.println("Sorry, the server has shut down.");
@@ -37,7 +37,7 @@ public class Server
 
     public static void main(String[] args)
     {
-        new Server();
+        Server server = new Server();
     }
 
 
@@ -48,15 +48,19 @@ public class Server
     
     private class GameLogic
     {
+        /*
+            lOGIC NOTES:
+                - We need an ArrayList of all the altered tiles after each move, which is sent to all the clients
+                  to update visuals
+                - On the field, 1 represents a bomb, 0 represents a safe tile, and 2 should represent a cleared
+                  tile, which should be fed into the ArrayList of altered tiles to update the visuals
+        */
+        
         private int mines = 10;
         private int rows = 9;
         private int cols = 9;
 
         private int[][] field = createField();
-        
-        public int[][] getField() {
-            return field;
-        }
         
         private int[][] createField() {
             int[] tempField = new int[rows*cols];
@@ -92,14 +96,12 @@ public class Server
             if(col+1 < cols+1 && field[row][col+1] > 0) {
                 count++;
             }
-
             if(row-1 > 0 && field[row-1][col] > 0) {
                 count++;
             }
             if(row+1 < rows+1 && field[row+1][col] > 0) {
                 count++;
             }
-
             //diagonals
             if(col-1 >0 && row-1 >0 && field[row-1][col-1] >0) {
                 count++;
@@ -107,46 +109,87 @@ public class Server
             if(col+1 < cols+1 && row-1 >0 && field[row-1][col+1] >0) {
                 count++;
             }
-
             if(col-1 >0 && row+1 < rows+1 && field[row+1][col-1] >0) {
                 count++;
             }
             if(col+1 < cols+1 && row+1 < rows+1 && field[row+1][col+1] >0) {
                 count++;
             }
-            
             return count;
         }
 
-
-        //0 is safe
-        //1 is bomb
-        //2 is cleared
+        //0 is hidden safe
+        //1 is hidden bomb
+        //2 is cleared safe
+        //3 is cleared BOMB
+        //basically, bombs are odds
         //jamshed wanted this over enums so thats on him
-        public void clearSafeTile(int row, int col) {
-            if(row <= 0 || row > rows) {
-                return;
+        // returns an array of tiles to be update in visuals
+        public ArrayList<String> logicUpdate(int col, int row) //col = x, row = y
+        {
+            ArrayList<String> affectedTiles = new ArrayList<String>();
+            if(field[row][col] == 1) // if we click a bomb
+            {
+                // REVEAL THE WHOLE BOARD 
+                for(int y = 0; y < rows; y++)
+                {
+                    for(int x = 0; x < cols; x++)
+                    {
+                        if(field[y][x] == 0)
+                        {
+                            field[y][x] = 2;
+                            affectedTiles.add(y + "." + x);
+                        } else if (field[y][x] == 1)
+                        {
+                            field[y][x] = 3;
+                            affectedTiles.add(y + "." + x);
+                        }
+                        // ignore others, as they stay the same
+                    }
+                }
+            } else if (field[row][col] == 0) // if we clicked on a safe
+            {
+                // ALTERS THE BOARD VVVVV
+                String changes = clearSafeTile(row, col);
+                // now decode changes and add them to the arraylist
+                // encoded as this:
+                // r.c!  where r is row, c is column, and they are a pair as r.c, and seperate pairs by !
+
+                String[] vals = changes.split("!");
+                for (String val : vals)
+                {
+                    affectedTiles.add(val);
+                }
             }
-            if(col <= 0 || col > cols) {
-                return;
+            return affectedTiles;
+        }
+
+
+        public String clearSafeTile(int row, int col) {
+            // Check if we are in bounds to save us from null errors
+            if(row < 0 || row >= rows) { 
+                return "";
             }
-            if(field[row][col] == 2) {
-                return;
+            if(col < 0 || col >= cols) {
+                return "";
             }
 
-            field[row][col] = 2;
-            if( countNearbyBombs(row, col) == 0 ) {
-                clearSafeTile(row-1, col-1);
-                clearSafeTile(row-1, col);
-                clearSafeTile(row-1, col+1);
+            if(countNearbyBombs(row, col) == 0) { // if its safe, add it AND ALL of the other ones
+                field[row][col] = 2;
+                return (row + "." + col + "!") 
+                    + clearSafeTile(row-1, col-1) // above
+                    + clearSafeTile(row-1, col)
+                    + clearSafeTile(row-1, col+1)
 
-                clearSafeTile(row, col-1);
-                clearSafeTile(row, col+1);
+                    + clearSafeTile(row, col-1) //   side
+                    + clearSafeTile(row, col+1)
 
-                clearSafeTile(row+1, col-1);
-                clearSafeTile(row+1, col);
-                clearSafeTile(row+1, col+1);
+                    + clearSafeTile(row+1, col-1) // below
+                    + clearSafeTile(row+1, col)
+                    + clearSafeTile(row+1, col+1);
             }
+            // If its 1, 2, or 3, add nothing, they stay the same
+            return "";
         }
 
         //assuming that the click is actually on a tile
@@ -161,18 +204,17 @@ public class Server
                     field[0][i] = 2;
                 }
             }
-            
         }
     }
 
-    private class ConnectionHandler extends Thread
+    private class ConnectionHandler extends Thread // MODIFY THIS COMPLETELY
     {
         private /* static */ ArrayList<ConnectionHandler> handlers;
         Socket socket;
         ObjectInputStream in;
         ObjectOutputStream out;
 
-        public ConnectionHandler(Socket s)
+        public ConnectionHandler(Socket s) // Establish connection to streams
         {
             socket = s;
             if (handlers == null)
