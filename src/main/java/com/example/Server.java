@@ -19,12 +19,13 @@ public class Server
     // Upon creating a server, establish all of the following connections
     public Server(){
         ServerSocket listener;
+        GameLogic logic = new GameLogic();
         try {
             listener = new ServerSocket(LISTENING_PORT);
 
             while(true){
                  //Keep creating new ConnectionHandlers
-                ConnectionHandler temp = new ConnectionHandler(listener.accept());
+                ConnectionHandler temp = new ConnectionHandler(listener.accept(), logic);
                 System.out.println("Successsfully connected to (" + temp.socket.getInetAddress().toString() + ")!");
                 temp.start();
             }
@@ -125,7 +126,7 @@ public class Server
         //basically, bombs are odds
         //jamshed wanted this over enums so thats on him
         // returns an array of tiles to be update in visuals
-        public ArrayList<String> logicUpdate(int col, int row) //col = x, row = y
+        public ArrayList<String> logicUpdate(int row, int col) //col = x, row = y
         {
             ArrayList<String> affectedTiles = new ArrayList<String>();
             if(field[row][col] == 1) // if we click a bomb
@@ -154,13 +155,15 @@ public class Server
                 // now decode changes and add them to the arraylist
                 // encoded as this:
                 // r.c!  where r is row, c is column, and they are a pair as r.c, and seperate pairs by !
-
                 String[] vals = changes.split("!");
                 for (String val : vals)
                 {
-                    affectedTiles.add(val);
+                    if (!val.isEmpty()) {
+                        affectedTiles.add(val);
+                    }
                 }
             }
+
             return affectedTiles;
         }
 
@@ -209,12 +212,13 @@ public class Server
 
     private class ConnectionHandler extends Thread // MODIFY THIS COMPLETELY
     {
-        private /* static */ ArrayList<ConnectionHandler> handlers;
+        private static ArrayList<ConnectionHandler> handlers;
         Socket socket;
         ObjectInputStream in;
         ObjectOutputStream out;
+        GameLogic gameLogic;
 
-        public ConnectionHandler(Socket s) // Establish connection to streams
+        public ConnectionHandler(Socket s, GameLogic gl) // Establish connection to streams
         {
             socket = s;
             if (handlers == null)
@@ -222,7 +226,7 @@ public class Server
                 handlers = new ArrayList<ConnectionHandler>();
             }
             handlers.add(this);
-            
+            gameLogic = gl;
             //Attempt to connect in and out streams
             try {
                 in = (ObjectInputStream) socket.getInputStream();
@@ -234,7 +238,36 @@ public class Server
 
         public void run ()
         {
-            
+            while(true)
+            {
+                try {
+                    String coords = (String)in.readObject();
+                    String[] c = coords.split("\\.");
+                    ArrayList<String> updates = gameLogic.logicUpdate(Integer.parseInt(c[0]), Integer.parseInt(c[1]));
+                    sendUpdates(updates);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } // end of while
+        } // end of run
+
+        private void sendUpdates(ArrayList<String> inputs) // send out our array of 
+        {
+            synchronized(this)
+            {
+                for (ConnectionHandler handler : handlers)
+                {
+                    try {
+                        synchronized(handler)
+                        {
+                            handler.out.writeObject(inputs);
+                            handler.out.flush();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
     }
 }
