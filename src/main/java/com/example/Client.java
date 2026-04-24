@@ -3,6 +3,7 @@ package com.example;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -194,11 +195,19 @@ public class Client
             {
                 try
                 {
-                    String incomingMessage = (String) updateStream.readObject();
+                    ArrayList<String> incomingUpdates = (ArrayList<String>) updateStream.readObject();
                     SwingUtilities.invokeLater(() -> {
-                        System.out.println(incomingMessage);
+                        System.out.println(incomingUpdates);
                         // messageArea.setText(messageArea.getText() + "\n" + incomingMessage);
                         // messageArea.setCaretPosition(messageArea.getDocument().getLength());
+
+                        //Take the array of string coordinates and make changes to there states
+                        for(String pair : incomingUpdates)
+                        {
+                            String[] splitPair = pair.split("\\.");
+                            int row = Integer.parseInt(splitPair[0]);
+                            int col = Integer.parseInt(splitPair[1]);
+                        }
                     });   
                 } catch (Exception e)
                 {
