@@ -241,7 +241,10 @@ public class Server
             while(true)
             {
                 try {
+                    // Get incoming coordinates of where a player clicked
                     String coords = (String)in.readObject();
+                    // break up the coords into r and y, then use logicUpdate to update the board
+                    // and get all the changed tiles
                     String[] c = coords.split("\\.");
                     ArrayList<String> updates = gameLogic.logicUpdate(Integer.parseInt(c[0]), Integer.parseInt(c[1]));
                     sendUpdates(updates);
@@ -251,17 +254,17 @@ public class Server
             } // end of while
         } // end of run
 
-        private void sendUpdates(ArrayList<String> inputs) // send out our array of 
+        private void sendUpdates(ArrayList<String> inputs) // send out our array of coordinates
         {
-            synchronized(this)
+            synchronized(this) // focus me
             {
                 for (ConnectionHandler handler : handlers)
                 {
                     try {
-                        synchronized(handler)
+                        synchronized(handler) // focus everyone individually
                         {
-                            handler.out.writeObject(inputs);
-                            handler.out.flush();
+                            handler.out.writeObject(inputs); //send out the update 
+                            handler.out.flush(); // immediately
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

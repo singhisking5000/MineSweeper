@@ -11,6 +11,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -69,12 +70,18 @@ public class Client
         top = new JLabel();
         board = new JPanel();
         f.setLayout(new BorderLayout());
-        board.setLayout(new GridLayout(rows, cols));
+        board.setLayout(new GridBagLayout());
         f.add(top, BorderLayout.NORTH);
         f.add(board, BorderLayout.CENTER);
 
         // for later use
         GridBagConstraints c = new GridBagConstraints();
+        c.gridheight = 1;
+        c.gridwidth = 1;
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridx = 0;
+        c.gridy = 0;
 
         // Now set up the board
         // to be implemented:
@@ -126,8 +133,10 @@ public class Client
                         } // end of switch
                     } // end of if
 
+                    c.gridx = x;
+                    c.gridy = y;
                     JLabel temp = new JLabel(img);
-                    board.add(temp);
+                    board.add(temp, c);
                 } // end of for y
             } // end of for x
         } catch (Exception e) {
@@ -205,8 +214,20 @@ public class Client
                         for(String pair : incomingUpdates)
                         {
                             String[] splitPair = pair.split("\\.");
+                            // our position to lock in
                             int row = Integer.parseInt(splitPair[0]);
                             int col = Integer.parseInt(splitPair[1]);
+                            
+                            // now update the picture icon
+                            //img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/OneTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
+                            String location = "src/main/java/com/example/";
+                            BufferedImage tile = (BufferedImage)getComponent(row, col);
+                            switch (tiles[row][col])
+                            {
+                                case 0:
+
+                                    
+                            }
                         }
                     });   
                 } catch (Exception e)
@@ -215,6 +236,11 @@ public class Client
                     break;
                 }
             }
+        }
+
+        private Component getComponent(int r, int c)
+        {
+            return board.getComponentAt(r*size, c*size);
         }
     }
 }
