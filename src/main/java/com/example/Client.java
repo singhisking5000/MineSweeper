@@ -221,11 +221,18 @@ public class Client
                             // now update the picture icon
                             //img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/OneTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
                             String location = "src/main/java/com/example/";
-                            BufferedImage tile = (BufferedImage)getComponent(row, col);
+                            // we need to somehow find the exact icon, and edit it
+                            // we just need a way to grab an element KNOWING its a picture
+                            // ;
+                            board.remove(board.getComponentAt(row*size,col*size));
                             switch (tiles[row][col])
                             {
                                 case 0:
+                                    
+                                case 1:
 
+                                case 2:
+                                    board.add(/* someting */);
                                     
                             }
                         }
