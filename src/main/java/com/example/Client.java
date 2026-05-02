@@ -23,17 +23,7 @@ public class Client
     private static JLabel top;
     private static JPanel board;
     private static int size = 40;
-    private static int[][] tiles = {
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 1, 0, 0, 0, 1, 0, 0},
-            {0, 0, 1, 0, 0, 0, 1, 0, 0},
-            {0, 0, 0, 0, 1, 0, 0, 0, 0},
-            {0, 1, 0, 0, 0, 0, 0, 1, 0},
-            {0, 0, 1, 0, 0, 0, 1, 0, 0},
-            {0, 0, 0, 1, 0, 1, 0, 0, 0},
-            {0, 0, 0, 0, 1, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 0, 0, 0, 0},
-        };;
+    private static int[][] tiles;
     private static int rows = 9;
     private static int cols = 9;
 
@@ -45,7 +35,6 @@ public class Client
         //get the localhost IP address, if server is running on some other IP, you need to use that
         System.out.println("Running main in client!");
         InetAddress host = InetAddress.getLocalHost();
-
  
         Socket socket = new Socket(host.getHostName(), 9876);
 
@@ -57,7 +46,6 @@ public class Client
         updates.start();
         System.out.println("going to call createGUI");
         setupGUI(socket, in, out, updates);
-        // createGUI(out, socket, in, incoming);
     }
 
 
@@ -92,7 +80,6 @@ public class Client
 
 
         try {
-
             // TEMPORARY creates its own custom board to test functions. DO NOT USE THIS ALMOST AT ALL
             // USE ONLY AS REFERENCE FOR IMAGE SCALING, LOGIC, AND OTHERS, DO NOT USE OTHERWISE!!!!!!!
             for(int x = 0; x < tiles.length; x++){
@@ -194,6 +181,7 @@ public class Client
     {
         //Catch all updates into our input stream
         ObjectInputStream updateStream;
+        private static boolean first = true;
 
         public updater(ObjectInputStream i) {
             updateStream = i;
@@ -204,6 +192,11 @@ public class Client
             {
                 try
                 {
+                    //Our first packet of info is our field, so if its the first use this vvv
+                    if(first)
+                    {
+                        tiles = (int[][])updateStream.readObject();
+                    }
                     ArrayList<String> incomingUpdates = (ArrayList<String>) updateStream.readObject();
                     SwingUtilities.invokeLater(() -> {
                         System.out.println(incomingUpdates);
@@ -224,16 +217,41 @@ public class Client
                             // we need to somehow find the exact icon, and edit it
                             // we just need a way to grab an element KNOWING its a picture
                             // ;
-                            board.remove(board.getComponentAt(row*size,col*size));
-                            switch (tiles[row][col])
+                            int index = (row * cols) + col;
+                            JLabel tile = (JLabel)board.getComponent(index); 
+                            try {
+                                switch (tiles[row][col])
+                                {
+                                    case 2:
+                                        switch (countNearbyBombs(row, col))
+                                        {
+                                            case 1:
+                                                tile.setIcon(new ImageIcon(ImageIO.read(new File(location + "OneTile.png")).getScaledInstance(size,size, Image.SCALE_DEFAULT)));
+                                            case 2:
+                                                tile.setIcon(new ImageIcon(ImageIO.read(new File(location + "TwoTile.png")).getScaledInstance(size,size, Image.SCALE_DEFAULT)));
+                                            case 3:
+                                                tile.setIcon(new ImageIcon(ImageIO.read(new File(location + "ThreeTile.png")).getScaledInstance(size,size, Image.SCALE_DEFAULT)));
+                                            case 4:
+                                                tile.setIcon(new ImageIcon(ImageIO.read(new File(location + "FourTile.png")).getScaledInstance(size,size, Image.SCALE_DEFAULT)));
+                                            case 5:
+                                                tile.setIcon(new ImageIcon(ImageIO.read(new File(location + "FiveTile.png")).getScaledInstance(size,size, Image.SCALE_DEFAULT)));
+                                            case 6:
+                                                tile.setIcon(new ImageIcon(ImageIO.read(new File(location + "SixTile.png")).getScaledInstance(size,size, Image.SCALE_DEFAULT)));
+                                            case 7:
+                                                tile.setIcon(new ImageIcon(ImageIO.read(new File(location + "SevenTile.png")).getScaledInstance(size,size, Image.SCALE_DEFAULT)));
+                                            case 8:
+                                                tile.setIcon(new ImageIcon(ImageIO.read(new File(location + "EightTile.png")).getScaledInstance(size,size, Image.SCALE_DEFAULT)));
+                                            default:
+                                                tile.setIcon(new ImageIcon(ImageIO.read(new File(location + "Cleared.png")).getScaledInstance(size,size, Image.SCALE_DEFAULT)));
+                                        }
+                                    case 3:
+                                        tile.setIcon(new ImageIcon(ImageIO.read(new File(location + "Bomb.png")).getScaledInstance(size,size, Image.SCALE_DEFAULT)));
+                                    default:
+                                        return;
+                                }
+                            } catch (Exception e)
                             {
-                                case 0:
-                                    
-                                case 1:
-
-                                case 2:
-                                    board.add(/* someting */);
-                                    
+                                e.printStackTrace();
                             }
                         }
                     });   

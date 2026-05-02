@@ -28,6 +28,7 @@ public class Server
                 ConnectionHandler temp = new ConnectionHandler(listener.accept(), logic);
                 System.out.println("Successsfully connected to (" + temp.socket.getInetAddress().toString() + ")!");
                 temp.start();
+                temp.out.writeObject(logic.field);
             }
         } catch (Exception e) {
             System.out.println("Sorry, the server has shut down.");
@@ -229,8 +230,8 @@ public class Server
             gameLogic = gl;
             //Attempt to connect in and out streams
             try {
-                in = (ObjectInputStream) socket.getInputStream();
-                out = (ObjectOutputStream) socket.getOutputStream();
+                in = new ObjectInputStream(socket.getInputStream());
+                out = new ObjectOutputStream(socket.getOutputStream());
             } catch (Exception e) {
                 e.printStackTrace();
             }
