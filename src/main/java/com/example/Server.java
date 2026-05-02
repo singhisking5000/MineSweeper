@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 //okay time to write 2 lines of comments and stop for the day
 public class Server
 {
@@ -72,7 +73,10 @@ public class Server
                 tempField[i] = 1;
             }
 
-            Collections.shuffle(Arrays.asList(tempField));
+            //Collections.shuffle an array isn't shuffling correctly
+            // so I used a function someone else created to do it.
+            //Collections.shuffle(Arrays.asList(tempField));
+            shuffleArray(tempField);
 
             //turn into 2d array
             for(int i=0; i<tempField.length; i++) {
@@ -82,9 +86,35 @@ public class Server
             }
 
             System.out.println(Arrays.toString(newField));
+            String str = "";
+            for (int r = 0; r < newField.length; r++)
+            {
+                for (int c = 0; c < newField.length; c++)
+                {
+                    if(c != newField[r].length-1)
+                    {
+                        str += newField[r][c] + ", ";
+                    } else {
+                        str += newField[r][c] + "\n";
+                    }
+                }
+            }
+            System.out.println(str);
             return newField;
         }
 
+        private static void shuffleArray(int[] ar)
+        {
+            Random rnd = new Random();
+            for (int i = ar.length - 1; i > 0; i--)
+            {
+            int index = rnd.nextInt(i + 1);
+            // Simple swap
+            int a = ar[index];
+            ar[index] = ar[i];
+            ar[i] = a;
+            }
+        }
         private int countNearbyBombs(int row, int col) {
             if(field[row][col] == 1) {
                 return 0;

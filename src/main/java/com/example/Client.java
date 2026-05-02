@@ -26,11 +26,7 @@ public class Client
     private static int[][] tiles;
     private static int rows = 9;
     private static int cols = 9;
-
-    // public static void main(String[] args)
-    // {
-    //     setupGUI();
-    // }
+    
     public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException, InterruptedException {
         //get the localhost IP address, if server is running on some other IP, you need to use that
         System.out.println("Running main in client!");
