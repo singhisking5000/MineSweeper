@@ -241,7 +241,7 @@ public class Server
         }
     }
 
-    private class ConnectionHandler extends Thread // MODIFY THIS COMPLETELY
+    private class ConnectionHandler extends Thread
     {
         private static ArrayList<ConnectionHandler> handlers;
         Socket socket;
