@@ -11,6 +11,9 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -51,11 +54,11 @@ public class Client
         f.setPreferredSize(new Dimension(size*cols, size*rows));
         f.setSize(new Dimension(size*cols, size*rows));
         f.setLocation(500,200);
-        top = new JLabel();
+        // top = new JLabel();
         board = new JPanel();
         f.setLayout(new BorderLayout());
         board.setLayout(new GridBagLayout());
-        f.add(top, BorderLayout.NORTH);
+        //f.add(top, BorderLayout.NORTH);
         f.add(board, BorderLayout.CENTER);
 
         // for later use
@@ -78,8 +81,8 @@ public class Client
         try {
             // TEMPORARY creates its own custom board to test functions. DO NOT USE THIS ALMOST AT ALL
             // USE ONLY AS REFERENCE FOR IMAGE SCALING, LOGIC, AND OTHERS, DO NOT USE OTHERWISE!!!!!!!
-            for(int x = 0; x < tiles.length; x++){
-                for(int y = 0; y < tiles[x].length; y++){
+            for(int y = 0; y < tiles.length; y++){
+                for(int x = 0; x < tiles[y].length; x++){
                     ImageIcon img;
                     img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/BlankTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT)); // default to a bomb! :)
                     
@@ -125,6 +128,36 @@ public class Client
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
+        board.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int x = e.getX() / size;
+                int y = e.getY() / size;
+                try
+                {
+                    o.writeObject(x + "." + y);
+                    o.flush();
+                } catch (Exception err)
+                {
+                    err.printStackTrace();
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+        });
 
         f.setVisible(true);
     }
