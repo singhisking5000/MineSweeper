@@ -52,14 +52,14 @@ public class Client
     {
         f = new JFrame();
         f.setPreferredSize(new Dimension(size*cols, size*rows));
-        f.setSize(new Dimension(size*cols, size*rows));
+        f.setSize(new Dimension(size*(cols + 1), size*(rows + 1)));
         f.setLocation(500,200);
         // top = new JLabel();
         board = new JPanel();
-        f.setLayout(new BorderLayout());
+        f.setLayout(new FlowLayout());
         board.setLayout(new GridBagLayout());
         //f.add(top, BorderLayout.NORTH);
-        f.add(board, BorderLayout.CENTER);
+        f.add(board);
 
         // for later use
         GridBagConstraints c = new GridBagConstraints();
@@ -86,39 +86,6 @@ public class Client
                     ImageIcon img;
                     img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/BlankTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT)); // default to a bomb! :)
                     
-                    // if(tiles[x][y] != 1) // If we're not a bomb...
-                    // {
-                    //     switch (countNearbyBombs(x,y)) // pick a picture
-                    //     {
-                    //         case 1:
-                    //             img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/OneTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
-                    //             break;
-                    //         case 2:
-                    //             img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/TwoTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
-                    //             break;
-                    //         case 3:
-                    //             img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/ThreeTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
-                    //             break;
-                    //         case 4:
-                    //             img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/FourTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
-                    //             break;
-                    //         case 5:
-                    //             img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/FiveTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
-                    //             break;
-                    //         case 6:
-                    //             img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/SixTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
-                    //             break;
-                    //         case 7:
-                    //             img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/SevenTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
-                    //             break;
-                    //         case 8:
-                    //             img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/EightTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
-                    //             break;
-                    //         default:
-                    //             img = new ImageIcon((ImageIO.read(new File("src/main/java/com/example/BlankTile.png"))).getScaledInstance(size,size, Image.SCALE_DEFAULT));
-                    //             break;
-                    //     } // end of switch
-                    // } // end of
                     c.gridx = x;
                     c.gridy = y;
                     JLabel temp = new JLabel(img);
