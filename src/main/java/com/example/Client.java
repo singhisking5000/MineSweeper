@@ -89,42 +89,44 @@ public class Client
                     c.gridx = x;
                     c.gridy = y;
                     JLabel temp = new JLabel(img);
+                    temp.addMouseListener(new MouseListener() {
+
+                        @Override
+                        public void mouseClicked(MouseEvent e) throws IOException {
+                            // try
+                            // {
+                                o.writeObject(x + "." + y);
+                                o.flush();
+                                System.out.println(x + ", " + y);
+                            // } catch (Exception err)
+                            // {
+                            //     err.printStackTrace();
+                            // }
+                        }
+
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                        }
+
+                        @Override
+                        public void mouseReleased(MouseEvent e) {
+                        }
+
+                        @Override
+                        public void mouseEntered(MouseEvent e) {
+                        }
+
+                        @Override
+                        public void mouseExited(MouseEvent e) {
+                        }
+                        
+                    });
                     board.add(temp, c);
                 } // end of for y
             } // end of for x
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
-        board.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int x = e.getX() / size;
-                int y = e.getY() / size;
-                try
-                {
-                    o.writeObject(x + "." + y);
-                    o.flush();
-                } catch (Exception err)
-                {
-                    err.printStackTrace();
-                }
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-            }
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-            }
-        });
 
         f.setVisible(true);
     }
